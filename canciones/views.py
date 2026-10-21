@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.views.decorators.http import require_POST
 
 from .forms import CancionForm
 from .services import song_service
@@ -36,6 +37,11 @@ def update(request, id):
         'form': form,
         'titulo': 'Editar cancion',
     })
+
+@require_POST
+def delete(request, id):
+    song_service.eliminar_cancion(id)
+    return redirect('index')
 
 
 

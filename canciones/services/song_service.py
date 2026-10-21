@@ -27,6 +27,11 @@ def actualizar_cancion(id, datos):
     cancion.save()
     return cancion
 
+def eliminar_cancion(id):
+    """Elimina los datos de la cancion existente"""
+    cancion = get_object_or_404(Cancion, pk=id)
+    cancion.delete()
+
 
 
 
