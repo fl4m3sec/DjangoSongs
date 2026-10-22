@@ -9,7 +9,20 @@
         <a href="{% url 'cancion_create' %}" class="btn btn-success">➕ Agregar canción</a>
     </div>
 
-    {% if canciones %}
+    <form method="get" action="{% url 'index' %}" class="row g-2 justify-content-center mb-4">
+        <div class="col-md-6">
+            <input type="text" name="q" value="{{ busqueda }}" class="form-control"
+                   placeholder="Buscar por título o artista...">
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-success">🔍 Buscar</button>
+            {% if busqueda %}
+                <a href="{% url 'index' %}" class="btn btn-outline-secondary">Limpiar</a>
+            {% endif %}
+        </div>
+    </form>
+
+    {% if pagina %}
         <table class="table table-dark table-striped table-hover align-middle">
             <thead>
                 <tr>
@@ -21,7 +34,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for cancion in canciones %}
+                {% for cancion in pagina %}
                     <tr>
                         <td>{{ cancion.id }}</td>
                         <td>{{ cancion.titulo }}</td>
@@ -42,6 +55,42 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        {% if pagina.paginator.num_pages > 1 %}
+            <nav aria-label="Paginación de canciones">
+                <ul class="pagination justify-content-center">
+                    {% if pagina.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ pagina.previous_page_number }}{% if busqueda %}&q={{ busqueda|urlencode }}{% endif %}">&laquo; Anterior</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">&laquo; Anterior</span></li>
+                    {% endif %}
+
+                    {% for numero in pagina.paginator.page_range %}
+                        <li class="page-item {% if numero == pagina.number %}active{% endif %}">
+                            <a class="page-link" href="?page={{ numero }}{% if busqueda %}&q={{ busqueda|urlencode }}{% endif %}">{{ numero }}</a>
+                        </li>
+                    {% endfor %}
+
+                    {% if pagina.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ pagina.next_page_number }}{% if busqueda %}&q={{ busqueda|urlencode }}{% endif %}">Siguiente &raquo;</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled"><span class="page-link">Siguiente &raquo;</span></li>
+                    {% endif %}
+                </ul>
+            </nav>
+            <p class="text-center text-secondary small">
+                Página {{ pagina.number }} de {{ pagina.paginator.num_pages }}
+                ({{ pagina.paginator.count }} canciones)
+            </p>
+        {% endif %}
+    {% elif busqueda %}
+        <div class="alert alert-secondary text-center">
+            No se encontraron canciones para <strong>"{{ busqueda }}"</strong>.
+        </div>
     {% else %}
         <div class="alert alert-secondary text-center">
             Aún no hay canciones registradas. ¡Agrega la primera!

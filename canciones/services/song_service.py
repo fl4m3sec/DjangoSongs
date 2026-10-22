@@ -1,10 +1,17 @@
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 from canciones.models import Cancion
 
-def obtener_todas():
+def obtener_todas(busqueda=''):
     """Muestrame todas la canciones, primero las mas populares"""
-    return Cancion.objects.all().order_by('-popularidad', 'titulo')
+    canciones = Cancion.objects.all()
+    if busqueda:
+        canciones = canciones.filter(
+            Q(titulo__icontains=busqueda) | Q(artista__icontains=busqueda)
+        )
+    return canciones.order_by('-popularidad', 'titulo')
+
 
 def obtener_por_id(id):
     """Devuelve una cancion o lanza un error 404 si no existe"""
